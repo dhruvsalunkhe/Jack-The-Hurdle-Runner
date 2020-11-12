@@ -12,8 +12,8 @@ var life = 5;
 var invisibleBlock, invisibleBlockGroup;
 
 function preload(){
- backgroundImg = loadImage("image/bg.jpg");
  playerImg = loadImage("player/idle.png");
+ getBackgroundImg();
  playerRunning = loadAnimation("player/Run000.png", "player/Run001.png", "player/Run002.png", "player/Run003.png", "player/Run004.png", "player/Run005.png", "player/Run006.png", "player/Run007.png", "player/Run008.png", "player/Run009.png");
  plyrRunLeft = loadAnimation("playerr/Run000.png", "playerr/Run001.png", "playerr/Run002.png", "playerr/Run004.png", "playerr/Run005.png", "playerr/Run007.png", "playerr/Run008.png", "playerr/Run009.png");
 }
@@ -46,6 +46,7 @@ function setup(){
 }
 
 function draw(){
+  if(backgroundImg)
   background(backgroundImg);
 
   fill("black");
@@ -121,42 +122,17 @@ function createObstacle(){
   }
 }
 
-// function fruits() {
-//   if(World.frameCount%80===0) {
-//     rand =  Math.round(random(1,4));
-//     if(rand===1) {
-//       fruit.addImage(fruit1);
-//     }
-//     else if(rand===2) {
-//       fruit.addImage(fruit2);
-//     }
-//     else if(rand===3) {
-//       fruit.addImage(fruit3);
-//     }
-//     else if(rand===4) {
-//       fruit.addImage(fruit4);
-//     }
-//     fruit.y = Math.round(random(50,340));
-  
-//     position =  Math.round(random(1,2));
+async function getBackgroundImg(){
+  var response = await fetch("http://worldtimeapi.org/api/timezone/Europe/London");
+  var responseJSON = response.json();
+  var datetime = responseJSON.datetime;
+  var hour = datetime.slice(11,13);
 
-    
-//     if(position==1)
-//     {
-//       fruit.x = 600;
-//       fruit.velocityX = -(7+(score/4));
-//     }
-//     else
-//     {
-//       if(position==2) {
-//         fruit.x = 0;
-//     fruit.velocityX = (7+(score/4));
-      
-    
-//     fruit.setLifetime = 100;
-//       }
-//     }
-//     fruitGroup.add(fruit);
-    
-// }
-// }
+  if(hour>=06 && hour<=18){
+    bg = "image/maxresdefault.jpg";
+  }
+  else{
+    bg = "image/bg.jpg";
+  }
+  backgroundImg = loadImage(bg);
+}
