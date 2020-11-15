@@ -7,13 +7,15 @@ var wall, wall1, wall2, wall3;
 var PLAY=1;
 var END =0;
 var gameState = PLAY;
-var score = 0;
-var life = 5;
+var score = 100;
 var invisibleBlock, invisibleBlockGroup;
+var block;
+var count=0;
 
 function preload(){
  playerImg = loadImage("player/idle.png");
  getBackgroundImg();
+ block = loadImage("player/block.jpg");
  playerRunning = loadAnimation("player/Run000.png", "player/Run001.png", "player/Run002.png", "player/Run003.png", "player/Run004.png", "player/Run005.png", "player/Run006.png", "player/Run007.png", "player/Run008.png", "player/Run009.png");
  plyrRunLeft = loadAnimation("playerr/Run000.png", "playerr/Run001.png", "playerr/Run002.png", "playerr/Run004.png", "playerr/Run005.png", "playerr/Run007.png", "playerr/Run008.png", "playerr/Run009.png");
 }
@@ -49,10 +51,12 @@ function draw(){
   if(backgroundImg)
   background(backgroundImg);
 
+ count = count + Math.round(getFrameRate()/30);
+
   fill("black");
   textSize(35);
   text.depth = 10;
-  text("Life : " + life, 80, 70);
+  text("Score : " + score, 80, 70);
 
  
    if(gameState === PLAY){
@@ -83,7 +87,16 @@ function draw(){
     player.destroy();
     gameState = END;
   }
-
+  if(invisibleBlockGroup.isTouching(player)){
+   score--;
+  }
+  else if(obstacleGroup.isTouching(player)){
+    score++
+  }
+  if(score <=0){
+    gameState = END;
+    player.destroy();
+  }
   createObstacle();
   drawSprites();
    }
@@ -96,15 +109,15 @@ function draw(){
       text("GAME OVER!!", 400, 400);
   }
 
-  if(invisibleBlockGroup.isTouching(player)){
-    life = life-1;
-  }
+  
 }
 
 function createObstacle(){
   if(frameCount%60===0){
     obstacle  = createSprite(300, -10, 500, 20);
-    obstacle.velocityY = 3;
+   // obstacle.addImage("obstacle",block);
+   // obstacle.scale = 0.3;
+    obstacle.velocityY = 3+count/200;
     obstacle.shapeColor=color(244, 226, 101);
     obstacle.x = Math.round(random(100, 1200));
     obstacle.lifetime= 225;
@@ -113,9 +126,9 @@ function createObstacle(){
     invisibleBlock.width = obstacle.width;
     invisibleBlock.height = 2;
     invisibleBlock.x = obstacle.x;
-    invisibleBlock.velocityY = 3;
+    invisibleBlock.velocityY = 3+count/200;
     invisibleBlock.lifetime = 225;
-    invisibleBlock.debug = true;
+    //invisibleBlock.debug = true;
     invisibleBlockGroup.add(invisibleBlock);
     
     obstacleGroup.add(obstacle);
@@ -123,8 +136,8 @@ function createObstacle(){
 }
 
 async function getBackgroundImg(){
-  var response = await fetch("http://worldtimeapi.org/api/timezone/Europe/London");
-  var responseJSON = response.json();
+  var response = await fetch("http://worldtimeapi.org/api/timezone/Asia/Kolkata");
+  var responseJSON =  await response.json();
   var datetime = responseJSON.datetime;
   var hour = datetime.slice(11,13);
 
